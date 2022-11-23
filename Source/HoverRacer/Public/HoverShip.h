@@ -30,7 +30,7 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="HoverShipControls")
 	void AntiGravity(float deltaTime, FRotator targetRotation);
 	UFUNCTION(BlueprintCallable, Category="HoverShipControls")
-	void SideThrust();
+	void SideThrust(float axisInput);
 	UFUNCTION(BlueprintCallable, Category="ShipBase")
 	void Initialize(UStaticMeshComponent* physicsObject);
 
@@ -88,7 +88,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Track Information")
 	FHitResult fHitResult;
 
-	FVector3f steeringAngle;
+	FVector steeringAngle;
 	UPIDController* pidController;
 	UPrimitiveComponent* ship;
 	float _drag;
