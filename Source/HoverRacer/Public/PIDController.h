@@ -25,15 +25,15 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float pCoeff = 0.08f;
+	float pCoeff = 0.0016f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float iCoeff = 0.0002f;
+	float iCoeff = 0.000004f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float dCoeff = 0.2f;
+	float dCoeff = 0.004f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float minimum = -1.0f;
+	float minimum = -3.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float maximum = 1.0f;
+	float maximum = 3.0f;
 
 	UFUNCTION(BlueprintCallable)
 	float Seek(float seekValue, float currentValue, float deltaTime);

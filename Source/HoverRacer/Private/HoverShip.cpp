@@ -72,7 +72,7 @@ void AHoverShip::Brake(float axisInput)
 /// </summary>
 void AHoverShip::Steer(float axisInput)
 {
-	steeringAngle = FVector::UpVector * ((steeringSpeed - speedDependentAngularDragMagnitude) * axisInput * physicsDeltaTime);
+	steeringAngle = GetActorUpVector() * ((steeringSpeed - speedDependentAngularDragMagnitude) * axisInput * physicsDeltaTime);
 	ship->AddTorqueInDegrees(steeringAngle, NAME_None, true);
 
 	FVector right = GetActorRightVector();
@@ -107,11 +107,11 @@ void AHoverShip::AntiGravity(float deltaTime, FRotator targetRotation)
 		groundNormal = fHitResult.ImpactNormal;
 
 		//...use the PID controller to determine the amount of hover force needed...
-		const float forcePercent = pidController->Seek(hoverHeight, height, deltaTime);
+		const float forcePercent = pidController->Seek(hoverHeight, height, physicsDeltaTime);
 		//...calculate the total amount of hover force based on normal (or "up") of the ground...
 		const FVector force = groundNormal * hoverMultiplier * forcePercent;
 		//...calculate the force and direction of gravity to adhere the ship to the track.
-		const FVector gravity = -groundNormal * downForceMultiplier * (FMath::Pow(height, 1.5f) / 100);
+		const FVector gravity = -groundNormal * downForceMultiplier * (height / 100);
 
 		//...and finally apply the hover and gravity forces
 		ship->AddForce(force);

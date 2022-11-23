@@ -3,6 +3,8 @@
 
 #include "PIDController.h"
 
+#include <string>
+
 // Sets default values for this component's properties
 UPIDController::UPIDController()
 {
@@ -34,15 +36,18 @@ void UPIDController::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 float UPIDController::Seek(float seekValue, float currentValue, float deltaTime)
 {
-	float Proportional = seekValue - currentValue;
+	const float Proportional = seekValue - currentValue;
 
-	float Derivative = (Proportional - _lastProportional) / deltaTime;
+	const float Derivative = (Proportional - _lastProportional) / deltaTime;
 	_integral += Proportional * deltaTime;
 	_lastProportional = Proportional;
 
 	float value = pCoeff * Proportional + iCoeff * _integral + dCoeff * Derivative;
 	value = FMath::Clamp(value, minimum, maximum);
 	
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::SanitizeFloat(value));
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::SanitizeFloat(Proportional));
+
 	return value;
 }
 
