@@ -21,6 +21,8 @@ void AHoverShip::Initialize(UStaticMeshComponent* physicsObject)
 	ship = physicsObject;
 }
 
+
+
 // Called when the game starts or when spawned
 void AHoverShip::BeginPlay()
 {
@@ -46,7 +48,7 @@ void AHoverShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AHoverShip::Acceleration(float axisInput)
 {
 	currentSpeed = axisInput  >= 0.01f && isOnRoadTrack ? FMath::Clamp(currentSpeed += 0.01f * accelerationConstant * physicsDeltaTime, 0,1)
-				: FMath::Clamp(currentSpeed -= 0.01f * decelerationConstant * physicsDeltaTime,0,1);
+				: FMath::Clamp(currentSpeed -= 0.01f * decelerationConstant * 10 * physicsDeltaTime,0,1);
 	ship->AddForce(GetActorForwardVector() * (maxSpeed * currentSpeed) - _drag);
 }
 
@@ -55,13 +57,13 @@ void AHoverShip::Acceleration(float axisInput)
 /// </summary>
 void AHoverShip::Brake(float axisInput)
 {
-	if (axisInput > 0.0f) return;
+	if (axisInput >= 0.0f) return;
 
-	currentBackwardsSpeed = axisInput <= -0.01f && isOnRoadTrack && currentSpeed <= 0.01f ?
-		FMath::Clamp(currentBackwardsSpeed += 0.01f * accelerationConstant * physicsDeltaTime, 0, 1)
-		: FMath::Clamp(currentBackwardsSpeed -= 0.01f * decelerationConstant * physicsDeltaTime, 0, 1);
+	//currentBackwardsSpeed = axisInput <= -0.01f && isOnRoadTrack && currentSpeed <= 0.01f ?
+	//	FMath::Clamp(currentBackwardsSpeed += 0.01f * accelerationConstant * physicsDeltaTime, 0, 1)
+	//	: FMath::Clamp(currentBackwardsSpeed -= 0.01f * decelerationConstant * brakeMultiplier * physicsDeltaTime, 0, 1);
 
-	ship->AddForce(GetActorForwardVector() * (brakeForce * axisInput * physicsDeltaTime * 10));
+	ship->AddForce(GetActorForwardVector() * (brakeForce * axisInput * physicsDeltaTime * 100));
 }
 
 /// <summary>
@@ -134,5 +136,19 @@ void AHoverShip::AntiGravity(float deltaTime, FRotator targetRotation)
 void AHoverShip::SideThrust(float axisInput)
 {
 	ship->AddForce(GetActorRightVector() * (sideThrustAmount * axisInput * physicsDeltaTime * 100));
+}
+
+void AHoverShip::AnimationInterpolator(float axisInput, float deltaTime)
+{
+	animationTime = FMath::Clamp(animationTime, 0, 1);
+	if (axisInput <= 0.01f && axisInput >= -0.01f)
+	{
+		animationTime = FMath::FInterpTo(animationTime, 0.5f, deltaTime, animationInterpolationSpeed * idleSteeringAnimationMultiplier);
+	}
+	else
+	{
+		animationTime += animationInterpolationSpeed * steerAnimationSpeedMultiplier * axisInput * deltaTime; 
+	}
+	GEngine->AddOnScreenDebugMessage(-1 ,2, FColor::Green, "function");
 }
 

@@ -33,6 +33,9 @@ protected:
 	void SideThrust(float axisInput);
 	UFUNCTION(BlueprintCallable, Category="ShipBase")
 	void Initialize(UStaticMeshComponent* physicsObject);
+	UFUNCTION(BlueprintCallable, Category="Animations")
+	void AnimationInterpolator(float axisInput, float deltaTime);
+	
 
 public:	
 	// Called every frame
@@ -54,6 +57,8 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Acceleration and Braking")
 	float brakeForce;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Acceleration and Braking")
+	float brakeMultiplier;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Acceleration and Braking")
 	float decelerationConstant;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Acceleration and Braking")
@@ -88,8 +93,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Track Information")
 	FHitResult fHitResult;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
+	float animationInterpolationSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
+	float steerAnimationSpeedMultiplier;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
+	float idleSteeringAnimationMultiplier;
+	UPROPERTY(BlueprintReadOnly, Category="Animations")
+	float animationTime;
+
 	FVector steeringAngle;
 	UPIDController* pidController;
 	UPrimitiveComponent* ship;
+	
 	float _drag;
 };

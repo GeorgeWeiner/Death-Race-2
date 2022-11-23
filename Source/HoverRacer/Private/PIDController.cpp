@@ -45,9 +45,6 @@ float UPIDController::Seek(float seekValue, float currentValue, float deltaTime)
 	float value = pCoeff * Proportional + iCoeff * _integral + dCoeff * Derivative;
 	value = FMath::Clamp(value, minimum, maximum);
 	
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::SanitizeFloat(value));
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::SanitizeFloat(Proportional));
-
 	return value;
 }
 
