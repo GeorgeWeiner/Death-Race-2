@@ -45,8 +45,8 @@ void AHoverShip::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 /// </summary>
 void AHoverShip::Acceleration(float axisInput)
 {
-	currentSpeed = axisInput  >= 0.01f && isOnRoadTrack ? FMath::Clamp(currentSpeed += 0.01f * accelerationConstant * physicsDeltaTime * 100, 0,1)
-				: FMath::Clamp(currentSpeed -= 0.01f * decelerationConstant * physicsDeltaTime * 100,0,1);
+	currentSpeed = axisInput  >= 0.01f && isOnRoadTrack ? FMath::Clamp(currentSpeed += 0.01f * accelerationConstant * physicsDeltaTime, 0,1)
+				: FMath::Clamp(currentSpeed -= 0.01f * decelerationConstant * physicsDeltaTime,0,1);
 	ship->AddForce(GetActorForwardVector() * (maxSpeed * currentSpeed) - _drag);
 }
 
@@ -58,8 +58,8 @@ void AHoverShip::Brake(float axisInput)
 	if (axisInput > 0.0f) return;
 
 	currentBackwardsSpeed = axisInput <= -0.01f && isOnRoadTrack && currentSpeed <= 0.01f ?
-		FMath::Clamp(currentBackwardsSpeed += 0.01f * accelerationConstant * physicsDeltaTime * 200, 0, 1)
-		: FMath::Clamp(currentBackwardsSpeed -= 0.01f * decelerationConstant * physicsDeltaTime * 500, 0, 1);
+		FMath::Clamp(currentBackwardsSpeed += 0.01f * accelerationConstant * physicsDeltaTime, 0, 1)
+		: FMath::Clamp(currentBackwardsSpeed -= 0.01f * decelerationConstant * physicsDeltaTime, 0, 1);
 
 	ship->AddForce(GetActorForwardVector() * (brakeForce * axisInput * physicsDeltaTime * 10));
 }
@@ -72,7 +72,7 @@ void AHoverShip::Brake(float axisInput)
 /// </summary>
 void AHoverShip::Steer(float axisInput)
 {
-	steeringAngle = GetActorUpVector() * ((steeringSpeed - speedDependentAngularDragMagnitude) * axisInput * physicsDeltaTime);
+	steeringAngle = GetActorUpVector() * ((steeringSpeed - speedDependentAngularDragMagnitude * currentSpeed) * axisInput * physicsDeltaTime);
 	ship->AddTorqueInDegrees(steeringAngle, NAME_None, true);
 
 	FVector right = GetActorRightVector();
