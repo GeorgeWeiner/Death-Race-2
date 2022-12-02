@@ -23,6 +23,7 @@ void AHoverShip::Initialize(UStaticMeshComponent* physicsObject)
 
 
 
+
 // Called when the game starts or when spawned
 void AHoverShip::BeginPlay()
 {
@@ -66,6 +67,11 @@ void AHoverShip::Brake(float axisInput)
 	ship->AddForce(GetActorForwardVector() * (brakeForce * axisInput * physicsDeltaTime * 100));
 }
 
+void AHoverShip::AirBrakes(float axisInput)
+{
+	
+}
+
 /// <summary>
 /// Applies the rotation of the local Y-Axis, by adding a torque towards an angle, resulting in somewhat realistic flying turn behavior.
 /// The amount of torque is dependent on the current speed variable, as higher speed equals higher angular drag (not of the rigidbody but added locally here).
@@ -103,31 +109,41 @@ void AHoverShip::AntiGravity(float deltaTime, FRotator targetRotation)
 	}
 
 	FVector groundNormal;
+	
 	if (isOnRoadTrack)
 	{
 		const float height = fHitResult.Distance;
 		groundNormal = fHitResult.ImpactNormal;
+		
+		if (height < pidHeightThreshold)
+		{
+			//...use the PID controller to determine the amount of hover force needed...
+			const float forcePercent = pidController->Seek(hoverHeight, height, physicsDeltaTime);
+			//...calculate the total amount of hover force based on normal (or "up") of the ground...
+			const FVector force = groundNormal * hoverMultiplier * forcePercent;
+			//...calculate the force and direction of gravity to adhere the ship to the track.
+			const FVector gravity = -groundNormal * downForceMultiplier * (height / 100);
 
-		//...use the PID controller to determine the amount of hover force needed...
-		const float forcePercent = pidController->Seek(hoverHeight, height, physicsDeltaTime);
-		//...calculate the total amount of hover force based on normal (or "up") of the ground...
-		const FVector force = groundNormal * hoverMultiplier * forcePercent;
-		//...calculate the force and direction of gravity to adhere the ship to the track.
-		const FVector gravity = -groundNormal * downForceMultiplier * (height / 100);
+			ship->AddForce(force);
+			ship->AddForce(gravity);
+		}
+		else
+		{
+			ship->AddForce(-groundNormal * fallGravityMultiplier * physicsDeltaTime * 100);
 
-		//...and finally apply the hover and gravity forces
-		ship->AddForce(force);
-		ship->AddForce(gravity);
+			GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Green, "Applying fall gravity.");
+		}
 	}
 	else
 	{
 		//...use Up to represent the ground normal.
 		groundNormal = FVector::UpVector;
-
-		//Calculate and apply the stronger falling gravity straight down on the ship
-		const FVector gravity = -groundNormal * downForceMultiplier;
-		ship->AddForce(gravity);
+		
+		ship->AddForce(-groundNormal * downForceMultiplier);
+		ship->AddForce(ship->GetForwardVector() * (downForceMultiplier / 2.5f));
 	}
+
+	
 }
 
 /// <summary>
@@ -138,17 +154,4 @@ void AHoverShip::SideThrust(float axisInput)
 	ship->AddForce(GetActorRightVector() * (sideThrustAmount * axisInput * physicsDeltaTime * 100));
 }
 
-void AHoverShip::AnimationInterpolator(float axisInput, float deltaTime)
-{
-	animationTime = FMath::Clamp(animationTime, 0, 1);
-	if (axisInput <= 0.01f && axisInput >= -0.01f)
-	{
-		animationTime = FMath::FInterpTo(animationTime, 0.5f, deltaTime, animationInterpolationSpeed * idleSteeringAnimationMultiplier);
-	}
-	else
-	{
-		animationTime += animationInterpolationSpeed * steerAnimationSpeedMultiplier * axisInput * deltaTime; 
-	}
-	GEngine->AddOnScreenDebugMessage(-1 ,2, FColor::Green, "function");
-}
 

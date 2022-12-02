@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "PIDController.h"
 #include "GameFramework/Pawn.h"
-#include "HoverRacer/PID_Controller.h"
 #include "HoverShip.generated.h"
 
 UCLASS()
@@ -33,8 +32,8 @@ protected:
 	void SideThrust(float axisInput);
 	UFUNCTION(BlueprintCallable, Category="ShipBase")
 	void Initialize(UStaticMeshComponent* physicsObject);
-	UFUNCTION(BlueprintCallable, Category="Animations")
-	void AnimationInterpolator(float axisInput, float deltaTime);
+	UFUNCTION(BlueprintCallable, Category="ShipBase")
+	void AirBrakes(float axisInput);
 	
 
 public:	
@@ -78,7 +77,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anti Gravity")
 	float hoverHeight;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anti Gravity")
+    float pidHeightThreshold;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anti Gravity")
+	float fallGravityMultiplier;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Anti Gravity")
 	bool isOnRoadTrack;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Physics")
 	float physicsDeltaTime = 0.05f;

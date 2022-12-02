@@ -13,5 +13,4 @@ UCLASS()
 class HOVERRACER_API AHoverRacerGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
 };
